@@ -1,19 +1,20 @@
 import mongodb from 'mongodb';
-//  import Collection from 'mongodb/lib/collection';
+// eslint-disable-next-line no-unused-vars
+import Collection from 'mongodb/lib/collection';
 import envLoader from './env_loader';
 
 /**
- * Represent a MongoDB Client.
+ * Represents a MongoDB client.
  */
 class DBClient {
   /**
-   * Creates a new MongoDB Client.
+   * Creates a new DBClient instance.
    */
   constructor() {
     envLoader();
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
-    const database = process.envDB_DATABASE || 'files_manager';
+    const database = process.env.DB_DATABASE || 'files_manager';
     const dbURL = `mongodb://${host}:${port}/${database}`;
 
     this.client = new mongodb.MongoClient(dbURL, { useUnifiedTopology: true });
@@ -22,13 +23,30 @@ class DBClient {
 
   /**
    * Checks if this client's connection to the MongoDB server is active.
+   * @returns {boolean}
    */
   isAlive() {
     return this.client.isConnected();
   }
 
   /**
-   * Retrieves a refernce to the 'users' collection.
+   * Retrieves the number of users in the database.
+   * @returns {Promise<Number>}
+   */
+  async nbUsers() {
+    return this.client.db().collection('users').countDocuments();
+  }
+
+  /**
+   * Retrieves the number of files in the database.
+   * @returns {Promise<Number>}
+   */
+  async nbFiles() {
+    return this.client.db().collection('files').countDocuments();
+  }
+
+  /**
+   * Retrieves a reference to the `users` collection.
    * @returns {Promise<Collection>}
    */
   async usersCollection() {
@@ -36,7 +54,7 @@ class DBClient {
   }
 
   /**
-   * Retrives a refernce to the 'files' collection.
+   * Retrieves a reference to the `files` collection.
    * @returns {Promise<Collection>}
    */
   async filesCollection() {

@@ -2,20 +2,20 @@ import { promisify } from 'util';
 import { createClient } from 'redis';
 
 /**
- * Represents a Redis Client.
+ * Represents a Redis client.
  */
 class RedisClient {
   /**
-   * Creates a new Redis Client.
+   * Creates a new RedisClient instance.
    */
   constructor() {
     this.client = createClient();
     this.isClientConnected = true;
-    this.client.on_connect('error', (err) => {
+    this.client.on('error', (err) => {
       console.error('Redis client failed to connect:', err.message || err.toString());
       this.isClientConnected = false;
     });
-    this.client.on_connect('connect', () => {
+    this.client.on('connect', () => {
       this.isClientConnected = true;
     });
   }
@@ -29,7 +29,7 @@ class RedisClient {
   }
 
   /**
-   * Retrives the value of a given key.
+   * Retrieves the value of a given key.
    * @param {String} key The key of the item to retrieve.
    * @returns {String | Object}
    */
@@ -38,14 +38,15 @@ class RedisClient {
   }
 
   /**
-   * Stores a key and its value along with anexpiration time.
-   * @param {String} ket The key of the item to store.
+   * Stores a key and its value along with an expiration time.
+   * @param {String} key The key of the item to store.
    * @param {String | Number | Boolean} value The item to store.
-   * @param {Number} durations The expiration time of the item in seconds.
+   * @param {Number} duration The expiration time of the item in seconds.
    * @returns {Promise<void>}
    */
   async set(key, value, duration) {
-    await promisify(this.client.SETEX).bind(this.client)(key, duration, value);
+    await promisify(this.client.SETEX)
+      .bind(this.client)(key, duration, value);
   }
 
   /**
